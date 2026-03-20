@@ -1,0 +1,58 @@
+import { NoticeboardPost } from '@/types';
+
+export const mockNoticeboardPosts: NoticeboardPost[] = [
+  {
+    id: 'nb1',
+    title: 'Community Garden Working Bee — Saturday 28 March',
+    body: 'We\'re hosting a working bee at the Southbank Community Garden this Saturday from 9am-1pm. All welcome! Light refreshments provided. Wear comfortable clothes and bring gloves if you have them.',
+    orgId: 'org2',
+    userId: 'u2',
+    category: 'EVENT',
+    createdAt: '2026-03-18T10:00:00Z',
+  },
+  {
+    id: 'nb2',
+    title: 'Free Coding Workshops — April Schedule',
+    body: 'TechStart Community is running free Introduction to Python workshops every Saturday in April, 10am-1pm. Open to anyone interested in learning to code. Limited spots — register at our website.',
+    orgId: 'org3',
+    userId: 'u3',
+    category: 'EVENT',
+    createdAt: '2026-03-17T14:00:00Z',
+  },
+  {
+    id: 'nb3',
+    title: 'Office Furniture Available — Free to a Good Home',
+    body: 'We\'re downsizing our office setup and have 4 ergonomic chairs and 2 standing desks available. In good condition. First come, first served. Contact sarah@greenspace.org.au',
+    orgId: 'org2',
+    userId: 'u2',
+    category: 'OFFER',
+    createdAt: '2026-03-15T09:00:00Z',
+  },
+  {
+    id: 'nb4',
+    title: 'Looking for Graphic Designer — Short Contract',
+    body: 'We need a graphic designer for a 2-week project to redesign our annual report template. Budget: $1,500. If your org has anyone with design skills or knows someone, please get in touch.',
+    orgId: 'org3',
+    userId: 'u3',
+    category: 'REQUEST',
+    createdAt: '2026-03-14T11:00:00Z',
+  },
+  {
+    id: 'nb5',
+    title: 'End of Financial Year Drinks — 26 June',
+    body: 'Join us for our annual EOFY drinks on Friday 26 June from 5pm in the Level 3 common area. A great chance to meet your fellow Ross House tenants. RSVP not required, just show up!',
+    orgId: 'org1',
+    userId: 'u1',
+    category: 'EVENT',
+    createdAt: '2026-03-12T15:00:00Z',
+  },
+  {
+    id: 'nb6',
+    title: 'Sustainability Report Research — Need Your Input',
+    body: 'Green Space Initiative is compiling a sustainability report for Melbourne CBD community orgs. 5-minute survey available. Your responses will help advocate for better sustainability policies.',
+    orgId: 'org2',
+    userId: 'u2',
+    category: 'REQUEST',
+    createdAt: '2026-03-10T10:00:00Z',
+  },
+];
