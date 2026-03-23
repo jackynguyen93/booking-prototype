@@ -6,9 +6,10 @@ import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, Calendar, BookOpen, User, Bell, FileText,
-  Receipt, Wrench, Key, MessageSquare, Award, PartyPopper,
+  Receipt, Wrench, Key, MessageSquare, Award, PartyPopper, Scale,
   Users, Building2, CalendarCheck, DoorOpen, FileCheck,
-  Package, Monitor, ChevronDown, ChevronRight
+  Package, Monitor, ChevronDown, ChevronRight, Heart, TrendingUp,
+  Mail, HardHat, BarChart3, Frame, Send, Vote
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -33,8 +34,19 @@ const tenantNavItems: NavItem[] = [
   { label: 'Maintenance', href: '/dashboard/maintenance', icon: <Wrench className="h-4 w-4" />, roles: ['MEMBER_TENANT', 'COMMERCIAL_TENANT'] },
   { label: 'Keys & Access', href: '/dashboard/keys', icon: <Key className="h-4 w-4" />, roles: ['MEMBER_TENANT', 'COMMERCIAL_TENANT'] },
   { label: 'Noticeboard', href: '/dashboard/noticeboard', icon: <MessageSquare className="h-4 w-4" />, roles: ['MEMBER_TENANT', 'COMMERCIAL_TENANT'] },
+  { label: 'Events', href: '/dashboard/events', icon: <PartyPopper className="h-4 w-4" />, roles: ['MEMBER_TENANT', 'COMMERCIAL_TENANT'] },
+  { label: 'Governance', href: '/dashboard/governance', icon: <Scale className="h-4 w-4" />, roles: ['MEMBER_TENANT', 'COMMERCIAL_TENANT'] },
+  { label: 'Window Display', href: '/dashboard/window-display', icon: <Frame className="h-4 w-4" />, roles: ['MEMBER_TENANT', 'COMMERCIAL_TENANT'] },
+  { label: 'Content Submissions', href: '/dashboard/content-submissions', icon: <Send className="h-4 w-4" />, roles: ['MEMBER_TENANT', 'COMMERCIAL_TENANT'] },
   { label: 'Grants', href: '/dashboard/grants', icon: <Award className="h-4 w-4" />, roles: ['MEMBER_TENANT'] },
-  { label: 'Community Events', href: '/dashboard/noticeboard', icon: <PartyPopper className="h-4 w-4" />, roles: ['MEMBER_TENANT', 'COMMERCIAL_TENANT'] },
+];
+
+const donorNavItems: NavItem[] = [
+  { label: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard className="h-4 w-4" /> },
+  { label: 'My Donations', href: '/dashboard/donations', icon: <Heart className="h-4 w-4" /> },
+  { label: 'Impact & Updates', href: '/dashboard/impact', icon: <TrendingUp className="h-4 w-4" /> },
+  { label: 'Notifications', href: '/dashboard/notifications', icon: <Bell className="h-4 w-4" /> },
+  { label: 'Profile', href: '/dashboard/profile', icon: <User className="h-4 w-4" /> },
 ];
 
 const adminNavItems: NavItem[] = [
@@ -43,10 +55,21 @@ const adminNavItems: NavItem[] = [
   { label: 'Organisations', href: '/admin/organisations', icon: <Building2 className="h-4 w-4" /> },
   { label: 'All Bookings', href: '/admin/bookings', icon: <CalendarCheck className="h-4 w-4" /> },
   { label: 'Rooms', href: '/admin/rooms', icon: <DoorOpen className="h-4 w-4" /> },
+  { label: 'Grants', href: '/admin/grants', icon: <Award className="h-4 w-4" /> },
+  { label: 'Publications', href: '/admin/publications', icon: <FileText className="h-4 w-4" /> },
+  { label: 'Communications', href: '/admin/communications', icon: <Mail className="h-4 w-4" /> },
+  { label: 'Donor CRM', href: '/admin/donors', icon: <Heart className="h-4 w-4" /> },
   { label: 'Invoices', href: '/admin/invoices', icon: <FileCheck className="h-4 w-4" /> },
   { label: 'Maintenance Queue', href: '/admin/maintenance', icon: <Wrench className="h-4 w-4" /> },
+  { label: 'Contractors', href: '/admin/contractors', icon: <HardHat className="h-4 w-4" /> },
   { label: 'Parcel Alerts', href: '/admin/parcels', icon: <Package className="h-4 w-4" /> },
   { label: 'Foyer Screen', href: '/admin/foyer-screen', icon: <Monitor className="h-4 w-4" /> },
+  { label: 'Keys & Access', href: '/admin/keys', icon: <Key className="h-4 w-4" /> },
+  { label: 'Events', href: '/admin/events', icon: <PartyPopper className="h-4 w-4" /> },
+  { label: 'Noticeboard', href: '/admin/noticeboard', icon: <MessageSquare className="h-4 w-4" /> },
+  { label: 'Content Submissions', href: '/admin/content-submissions', icon: <Send className="h-4 w-4" /> },
+  { label: 'Governance', href: '/admin/governance', icon: <Vote className="h-4 w-4" /> },
+  { label: 'Analytics', href: '/admin/analytics', icon: <BarChart3 className="h-4 w-4" /> },
 ];
 
 function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
@@ -96,22 +119,34 @@ export function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {/* Portal Nav */}
-        <div className="mb-2">
-          <p className="px-3 mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Portal</p>
-          {portalNavItems.map(item => (
-            <NavLink key={item.href + item.label} item={item} pathname={pathname} />
-          ))}
-        </div>
-
-        {/* Tenant Nav */}
-        {visibleTenantItems.length > 0 && (
-          <div className="mb-2 pt-2 border-t border-gray-200">
-            <p className="px-3 mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tenant Services</p>
-            {visibleTenantItems.map(item => (
+        {/* Donor Portal Nav */}
+        {role === 'DONOR_PARTNER' ? (
+          <div className="mb-2">
+            <p className="px-3 mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Donor Portal</p>
+            {donorNavItems.map(item => (
               <NavLink key={item.href + item.label} item={item} pathname={pathname} />
             ))}
           </div>
+        ) : (
+          <>
+            {/* Portal Nav */}
+            <div className="mb-2">
+              <p className="px-3 mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Portal</p>
+              {portalNavItems.map(item => (
+                <NavLink key={item.href + item.label} item={item} pathname={pathname} />
+              ))}
+            </div>
+
+            {/* Tenant Nav */}
+            {visibleTenantItems.length > 0 && (
+              <div className="mb-2 pt-2 border-t border-gray-200">
+                <p className="px-3 mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tenant Services</p>
+                {visibleTenantItems.map(item => (
+                  <NavLink key={item.href + item.label} item={item} pathname={pathname} />
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         {/* Admin Nav */}

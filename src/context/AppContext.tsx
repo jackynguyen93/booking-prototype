@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { Booking, Notification, MaintenanceRequest, NoticeboardPost, GrantApplication, KeyRecord, ParcelAlert, User, Organisation } from '@/types';
+import { Booking, Notification, MaintenanceRequest, NoticeboardPost, GrantApplication, KeyRecord, ParcelAlert, User, Organisation, Donation } from '@/types';
 import { mockBookings } from '@/data/bookings';
 import { mockNotifications } from '@/data/notifications';
 import { mockMaintenanceRequests } from '@/data/maintenanceRequests';
@@ -11,6 +11,7 @@ import { mockKeyRecords } from '@/data/keys';
 import { mockParcelAlerts } from '@/data/parcels';
 import { mockUsers } from '@/data/users';
 import { mockOrganisations } from '@/data/organisations';
+import { mockDonations } from '@/data/donations';
 
 interface AppContextType {
   bookings: Booking[];
@@ -22,6 +23,7 @@ interface AppContextType {
   parcelAlerts: ParcelAlert[];
   users: User[];
   organisations: Organisation[];
+  donations: Donation[];
 
   addBooking: (booking: Booking) => void;
   cancelBooking: (bookingId: string) => void;
@@ -31,14 +33,19 @@ interface AppContextType {
   addMaintenanceRequest: (req: MaintenanceRequest) => void;
   updateMaintenanceRequest: (id: string, updates: Partial<MaintenanceRequest>) => void;
   addNoticeboardPost: (post: NoticeboardPost) => void;
+  deleteNoticeboardPost: (id: string) => void;
   addGrantApplication: (app: GrantApplication) => void;
+  updateGrantApplication: (id: string, updates: Partial<GrantApplication>) => void;
   addKeyRecord: (record: KeyRecord) => void;
   updateKeyRecord: (id: string, updates: Partial<KeyRecord>) => void;
   addParcelAlert: (alert: ParcelAlert) => void;
   approveUser: (userId: string) => void;
   rejectUser: (userId: string) => void;
   addUser: (user: User) => void;
+  updateUser: (id: string, updates: Partial<User>) => void;
+  addOrganisation: (org: Organisation) => void;
   updateOrganisation: (id: string, updates: Partial<Organisation>) => void;
+  updateDonation: (id: string, updates: Partial<Donation>) => void;
   resetToMockData: () => void;
 }
 
@@ -72,6 +79,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [parcelAlerts, setParcelAlerts] = useState<ParcelAlert[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [organisations, setOrganisations] = useState<Organisation[]>([]);
+  const [donations, setDonations] = useState<Donation[]>([]);
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
@@ -84,6 +92,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setParcelAlerts(loadFromStorage('rh_parcels', mockParcelAlerts));
     setUsers(loadFromStorage('rh_users', mockUsers));
     setOrganisations(loadFromStorage('rh_organisations', mockOrganisations));
+    setDonations(loadFromStorage('rh_donations', mockDonations));
     setInitialized(true);
   }, []);
 
@@ -96,6 +105,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { if (initialized) saveToStorage('rh_parcels', parcelAlerts); }, [parcelAlerts, initialized]);
   useEffect(() => { if (initialized) saveToStorage('rh_users', users); }, [users, initialized]);
   useEffect(() => { if (initialized) saveToStorage('rh_organisations', organisations); }, [organisations, initialized]);
+  useEffect(() => { if (initialized) saveToStorage('rh_donations', donations); }, [donations, initialized]);
 
   const addBooking = useCallback((booking: Booking) => {
     setBookings(prev => [booking, ...prev]);
@@ -129,8 +139,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setNoticeboardPosts(prev => [post, ...prev]);
   }, []);
 
+  const deleteNoticeboardPost = useCallback((id: string) => {
+    setNoticeboardPosts(prev => prev.filter(p => p.id !== id));
+  }, []);
+
   const addGrantApplication = useCallback((app: GrantApplication) => {
     setGrantApplications(prev => [app, ...prev]);
+  }, []);
+
+  const updateGrantApplication = useCallback((id: string, updates: Partial<GrantApplication>) => {
+    setGrantApplications(prev => prev.map(g => g.id === id ? { ...g, ...updates } : g));
   }, []);
 
   const addKeyRecord = useCallback((record: KeyRecord) => {
@@ -157,8 +175,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setUsers(prev => [...prev, user]);
   }, []);
 
+  const updateUser = useCallback((id: string, updates: Partial<User>) => {
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, ...updates } : u));
+  }, []);
+
+  const addOrganisation = useCallback((org: Organisation) => {
+    setOrganisations(prev => [...prev, org]);
+  }, []);
+
   const updateOrganisation = useCallback((id: string, updates: Partial<Organisation>) => {
     setOrganisations(prev => prev.map(o => o.id === id ? { ...o, ...updates } : o));
+  }, []);
+
+  const updateDonation = useCallback((id: string, updates: Partial<Donation>) => {
+    setDonations(prev => prev.map(d => d.id === id ? { ...d, ...updates } : d));
   }, []);
 
   const resetToMockData = useCallback(() => {
@@ -171,17 +201,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setParcelAlerts(mockParcelAlerts);
     setUsers(mockUsers);
     setOrganisations(mockOrganisations);
+    setDonations(mockDonations);
   }, []);
 
   return (
     <AppContext.Provider value={{
       bookings, notifications, maintenanceRequests, noticeboardPosts,
-      grantApplications, keyRecords, parcelAlerts, users, organisations,
+      grantApplications, keyRecords, parcelAlerts, users, organisations, donations,
       addBooking, cancelBooking, markNotificationRead, markAllNotificationsRead,
       addNotification, addMaintenanceRequest, updateMaintenanceRequest,
-      addNoticeboardPost, addGrantApplication, addKeyRecord, updateKeyRecord,
-      addParcelAlert, approveUser, rejectUser, addUser, updateOrganisation,
-      resetToMockData,
+      addNoticeboardPost, deleteNoticeboardPost, addGrantApplication, updateGrantApplication, addKeyRecord, updateKeyRecord,
+      addParcelAlert, approveUser, rejectUser, addUser, updateUser, addOrganisation, updateOrganisation,
+      updateDonation, resetToMockData,
     }}>
       {children}
     </AppContext.Provider>

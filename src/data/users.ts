@@ -73,4 +73,16 @@ export const mockUsers: User[] = [
     createdAt: '2023-09-01',
     avatarInitials: 'BP',
   },
+  {
+    id: 'u7',
+    email: 'donor@greenpartners.org.au',
+    password: 'pass123',
+    name: 'Catherine Nguyen',
+    role: 'DONOR_PARTNER',
+    status: 'APPROVED',
+    orgId: 'org7',
+    phone: '0411 234 567',
+    createdAt: '2024-06-01',
+    avatarInitials: 'CN',
+  },
 ];

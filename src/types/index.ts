@@ -1,4 +1,4 @@
-export type UserRole = 'ADMIN' | 'MEMBER_TENANT' | 'COMMERCIAL_TENANT' | 'FACILITY_USER' | 'TRADES' | 'COMMUNITY_MEMBER';
+export type UserRole = 'ADMIN' | 'MEMBER_TENANT' | 'COMMERCIAL_TENANT' | 'FACILITY_USER' | 'TRADES' | 'COMMUNITY_MEMBER' | 'DONOR_PARTNER';
 export type UserStatus = 'APPROVED' | 'PENDING' | 'REJECTED' | 'SUSPENDED';
 
 export interface User {
@@ -161,4 +161,21 @@ export interface ParcelAlert {
   description: string;
   sentAt: string;
   sentBy: string;
+}
+
+export type DonationStatus = 'ACTIVE' | 'PAUSED' | 'CANCELLED' | 'COMPLETED';
+export type DonationFrequency = 'ONE_OFF' | 'MONTHLY' | 'QUARTERLY' | 'ANNUAL';
+
+export interface Donation {
+  id: string;
+  orgId: string;
+  userId: string;
+  amount: number;
+  frequency: DonationFrequency;
+  status: DonationStatus;
+  cause: string;
+  startDate: string;
+  nextPaymentDate?: string;
+  receiptNumber: string;
+  paymentMethod: string;
 }

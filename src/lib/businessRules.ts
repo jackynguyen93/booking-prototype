@@ -7,6 +7,7 @@ export const BOOKING_HOURS = {
   TRADES: { start: 8, end: 18 },
   ADMIN: { start: 0, end: 24 },
   COMMUNITY_MEMBER: { start: 8, end: 20 },
+  DONOR_PARTNER: { start: 8, end: 20 },
 };
 
 export function getBookingHours(role: UserRole) {

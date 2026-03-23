@@ -14,6 +14,7 @@ const demoAccounts = [
   { email: 'mike@externalbiz.com', password: 'pass123', role: 'Facility User', name: 'Mike Thompson' },
   { email: 'pending@neworg.org.au', password: 'pass123', role: 'Pending', name: 'Emma Wilson' },
   { email: 'trades@plumbing.com', password: 'pass123', role: 'Trades', name: 'Bob Plumber' },
+  { email: 'donor@greenpartners.org.au', password: 'pass123', role: 'Donor', name: 'Donor Lob' },
 ];
 
 export default function LoginPage() {

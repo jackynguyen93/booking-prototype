@@ -11,11 +11,12 @@ import { mockRooms } from '@/data/rooms';
 import { mockInvoices } from '@/data/invoices';
 import { mockOrganisations } from '@/data/organisations';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { Calendar, DollarSign, Clock, AlertCircle, Plus, Bell, BookOpen } from 'lucide-react';
+import { Calendar, DollarSign, Clock, AlertCircle, Plus, Bell, BookOpen, Heart, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 
-const TODAY = '2026-03-20';
+const TODAY = format(new Date(), 'yyyy-MM-dd');
+const CURRENT_MONTH = format(new Date(), 'yyyy-MM');
 
 const statusBadgeVariant = (status: string) => {
   if (status === 'CONFIRMED') return 'success';
@@ -26,7 +27,7 @@ const statusBadgeVariant = (status: string) => {
 
 export default function DashboardPage() {
   const { currentUser, isAdmin } = useAuth();
-  const { bookings, notifications, users } = useApp();
+  const { bookings, notifications, users, donations } = useApp();
 
   if (!currentUser) return null;
 
@@ -42,11 +43,121 @@ export default function DashboardPage() {
   const pendingUsers = users.filter(u => u.status === 'PENDING');
   const allPendingInvoices = mockInvoices.filter(i => i.status !== 'PAID');
   const monthRevenue = bookings
-    .filter(b => b.date.startsWith('2026-03') && b.status !== 'CANCELLED')
+    .filter(b => b.date.startsWith(CURRENT_MONTH) && b.status !== 'CANCELLED')
     .reduce((sum, b) => sum + b.totalPrice, 0);
 
   const getRoomName = (roomId: string) => mockRooms.find(r => r.id === roomId)?.name || roomId;
   const getOrgName = (orgId: string) => mockOrganisations.find(o => o.id === orgId)?.name || orgId;
+
+  // Donor dashboard
+  if (currentUser.role === 'DONOR_PARTNER') {
+    const myDonations = donations.filter(d => d.orgId === currentUser.orgId);
+    const currentYear = new Date().getFullYear().toString();
+    const totalThisYear = myDonations
+      .filter(d => d.startDate.startsWith(currentYear) || d.status === 'ACTIVE')
+      .reduce((sum, d) => sum + d.amount, 0);
+    const activeDonations = myDonations.filter(d => d.status === 'ACTIVE');
+    const nextPayments = myDonations
+      .filter(d => d.status === 'ACTIVE' && d.nextPaymentDate)
+      .map(d => d.nextPaymentDate!)
+      .sort();
+    const nextPayment = nextPayments[0] ? formatDate(nextPayments[0]) : '—';
+    const recentDonations = myDonations.slice(0, 3);
+
+    return (
+      <PortalLayout>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Welcome back, {currentUser.name.split(' ')[0]}</h1>
+            <p className="text-gray-500">{format(new Date(), "EEEE, d MMMM yyyy")} · Thank you for your continued support.</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <StatsCard title="Total Given This Year" value={formatCurrency(totalThisYear)} icon={<DollarSign className="h-7 w-7" />} accentColor="border-green-500" />
+            <StatsCard title="Active Donations" value={activeDonations.length} icon={<Heart className="h-7 w-7" />} accentColor="border-pink-500" />
+            <StatsCard title="Next Payment" value={nextPayment} icon={<Calendar className="h-7 w-7" />} accentColor="border-blue-500" />
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* Recent Donations */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <h2 className="font-semibold text-gray-900 flex items-center gap-2"><Heart className="h-4 w-4 text-pink-500" /> Recent Donations</h2>
+                  <Link href="/dashboard/donations"><Button variant="ghost" size="sm">View All</Button></Link>
+                </div>
+              </CardHeader>
+              <CardBody>
+                {recentDonations.length === 0 ? (
+                  <p className="text-gray-400 text-center py-4">No donations yet.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {recentDonations.map(d => (
+                      <div key={d.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                        <div>
+                          <p className="font-medium text-gray-700 text-sm">{d.cause}</p>
+                          <p className="text-xs text-gray-400">{formatDate(d.startDate)} · {d.frequency.replace('_', ' ').toLowerCase()}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold text-gray-800">{formatCurrency(d.amount)}</p>
+                          <Badge variant={d.status === 'ACTIVE' ? 'success' : d.status === 'PAUSED' ? 'warning' : 'default'}>{d.status}</Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardBody>
+            </Card>
+
+            {/* Fundraising Updates */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <h2 className="font-semibold text-gray-900 flex items-center gap-2"><TrendingUp className="h-4 w-4 text-[#1e3a5f]" /> Fundraising Updates</h2>
+                  <Link href="/dashboard/impact"><Button variant="ghost" size="sm">View All</Button></Link>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <div className="space-y-4">
+                  <div className="pb-3 border-b border-gray-50">
+                    <p className="text-xs text-gray-400 mb-0.5">12 March 2026</p>
+                    <p className="text-sm font-medium text-gray-800">New Community Arts Studio Opens</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Thanks to donor support, the Community Arts Studio on Level 3 is now open to 12 emerging artists.</p>
+                  </div>
+                  <div className="pb-3 border-b border-gray-50">
+                    <p className="text-xs text-gray-400 mb-0.5">28 February 2026</p>
+                    <p className="text-sm font-medium text-gray-800">Youth Wellbeing Program Reaches 500 Participants</p>
+                    <p className="text-xs text-gray-500 mt-0.5">The initiative has supported over 500 young people with an 82% positive outcome rate.</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 mb-0.5">14 January 2026</p>
+                    <p className="text-sm font-medium text-gray-800">$2.4M Milestone Reached</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Ross House Association has raised $2.4 million in total donations since 2008.</p>
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
+          </div>
+
+          {/* Quick links */}
+          <div className="flex gap-4">
+            <Link href="/dashboard/donations">
+              <Button>
+                <Heart className="h-4 w-4" />
+                Manage Donations
+              </Button>
+            </Link>
+            <Link href="/dashboard/impact">
+              <Button variant="outline">
+                <TrendingUp className="h-4 w-4" />
+                View Impact Report
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </PortalLayout>
+    );
+  }
 
   if (isAdmin()) {
     return (
@@ -67,7 +178,7 @@ export default function DashboardPage() {
           {/* Revenue bar chart */}
           <Card>
             <CardHeader>
-              <h2 className="font-semibold text-gray-900">Revenue by Room (March 2026)</h2>
+              <h2 className="font-semibold text-gray-900">Revenue by Room ({format(new Date(), 'MMMM yyyy')})</h2>
             </CardHeader>
             <CardBody>
               {mockRooms.filter(r => !r.adminManaged).map(room => {
